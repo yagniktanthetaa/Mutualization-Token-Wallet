@@ -1,32 +1,13 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
+import { replaceIpfsUrl } from "../common/utils/utility";
+import { SwapTokenContext } from "../context/SwapContext";
 
-export const replaceIpfsUrl = (data) => {
-  if (data) {
-    return data.replace("ipfs://", "https://ipfs.io/ipfs/");
-  } else {
-    return data;
-  }
-};
+const Token = () => {
+  const { selectChains, tokens } = useContext(SwapTokenContext);
 
-const Token = ({ selectChains }) => {
-  const [tokens, setTokens] = useState([]);
+  const [selectToken, setSelectToken] = useState("");
 
-  useEffect(() => {
-    getTokens();
-  }, []);
-
-  const getTokens = async () => {
-    await axios
-      .get("https://li.quest/v1/tokens")
-      .then((res) => {
-        // console.log(res.data.tokens);
-        setTokens(res.data.tokens);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  const handleSelectToken = (token) => setSelectToken(token);
 
   return (
     <>
@@ -34,7 +15,10 @@ const Token = ({ selectChains }) => {
         {tokens?.[selectChains]?.map((token, index) => (
           <div
             key={index}
-            className="token-chains mr-3  token-active px-4 py-3 my-2.5 cursor-pointer"
+            className={`${
+              selectToken === token.address ? "token-active" : ""
+            } token-chains mr-3 px-4 py-3 my-2.5 cursor-pointer`}
+            onClick={() => handleSelectToken(token.address)}
           >
             <div className="flex-between gap-6">
               <div className="flex-center gap-10">
@@ -45,6 +29,7 @@ const Token = ({ selectChains }) => {
                         ? replaceIpfsUrl(token.logoURI)
                         : token.logoURI
                     }
+                    loading="lazy"
                     alt={token.name}
                     className="w-12 h-12 rounded-full object-contain"
                   />
@@ -68,9 +53,11 @@ const Token = ({ selectChains }) => {
                   <p className="text-lg  font-normal">{token.name}</p>
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-[#AC8BDA] flex-center text-white text-base">
-                <i className="fa-solid fa-check"></i>
-              </div>
+              {token.address === selectToken && (
+                <div className="w-8 h-8 rounded-full bg-[#AC8BDA] flex-center text-white text-base">
+                  <i className="fa-solid fa-check"></i>
+                </div>
+              )}
             </div>
           </div>
         ))}

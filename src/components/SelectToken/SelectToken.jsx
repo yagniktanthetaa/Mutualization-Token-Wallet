@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import SwapWrapper from "../common/ui/SwapWrapper";
 import Button from "../common/ui/Button/Button";
 import Chains from "./Chains";
 import Token from "./Token";
+import { SwapTokenContext } from "../context/SwapContext";
 
 const SelectToken = () => {
-  const [selectChains, setSelectChains] = useState(1);
-  const [showMoreNetworks, setShowMoreNetworks] = useState(false);
+  const { selectChains, setShowMoreNetworks } = useContext(SwapTokenContext);
 
   const handleShowMoreNetworks = () => {
     setShowMoreNetworks((showMoreNetworks) => !showMoreNetworks);
@@ -36,11 +36,7 @@ const SelectToken = () => {
             </div>
           </div>
 
-          <Chains
-            selectChains={selectChains}
-            setSelectChains={setSelectChains}
-            showMoreNetworks={showMoreNetworks}
-          />
+          <Chains />
 
           <div className="my-6">
             <div

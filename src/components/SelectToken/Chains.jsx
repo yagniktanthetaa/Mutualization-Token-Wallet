@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useContext } from "react";
+import { SwapTokenContext } from "../context/SwapContext";
 
-const Chains = ({ selectChains, setSelectChains, showMoreNetworks }) => {
-  const [chains, setChains] = useState([]);
+const Chains = () => {
+  const { selectChains, setSelectChains, showMoreNetworks, chains } =
+    useContext(SwapTokenContext);
 
   const handleSelectToken = (index) => {
     setSelectChains(index);
-  };
-
-  useEffect(() => {
-    getChains();
-  }, []);
-
-  const getChains = async () => {
-    await axios
-      .get("https://li.quest/v1/chains")
-      .then((res) => {
-        // console.log(res.data.chains);
-        setChains(res.data.chains);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   return (
