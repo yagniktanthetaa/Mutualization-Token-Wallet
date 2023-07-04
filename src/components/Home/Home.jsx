@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EthereumBigLogo from "./../../assets/images/ethereum_big_logo.png";
-import EthereumSmallLogo from "./../../assets/images/ethereum_small_logo.png";
 import BinanceLogo from "./../../assets/images/binance_logo.png";
 import SwapWrapper from "../common/ui/SwapWrapper";
 import Button from "../common/ui/Button/Button";
+import SwapNetwork from "./SwapNetwork";
+import Token from "./Token";
 
 const AddTokensButton = ({ onClick }) => {
   return (
@@ -14,40 +15,50 @@ const AddTokensButton = ({ onClick }) => {
 };
 
 const Home = () => {
-  const [active, setActive] = useState("Mainnet");
+  const [activeNetwork, setActiveNetwork] = useState("Mainnet");
+  const initialTokens = JSON.parse(localStorage.getItem("tokens")) || [];
 
-  const handleActive = (name) => {
-    setActive(name);
-  };
-
-  const networkItem = [
-    { id: 1, name: "Mainnet" },
-    { id: 2, name: "Testnet" },
+  const INITIAL_TOKEN = [
+    {
+      image: EthereumBigLogo,
+      title: "ETH",
+      balance: "0.0",
+      inputPrice: 1,
+      estimate: "~$ 1,731.87",
+    },
   ];
 
-  const networkItemList = networkItem.map((networkItem) => (
-    <p
-      key={networkItem.id}
-      className={` py-1 px-3 text-base font-semibold cursor-pointer ${
-        active === networkItem.name
-          ? "text-[#1D1D1D] bg-white rounded-xl transition-all ease-in-out duration-300"
-          : "text-white"
-      }`}
-      onClick={() => handleActive(`${networkItem.name}`)}
-    >
-      {networkItem.name}
-    </p>
-  ));
+  const [addToken, setAddToken] = useState(
+    initialTokens.length ? initialTokens : INITIAL_TOKEN
+  );
 
-  const swapNetwork = () => {
-    return (
-      <div
-        className="flex-center gap-3 p-1 rounded-2xl"
-        style={{ border: "1px solid rgba(255, 255, 255, 0.15)" }}
-      >
-        {networkItemList}
-      </div>
-    );
+  useEffect(() => {
+    // Save the updated addToken data to localStorage whenever it changes
+    localStorage.setItem("tokens", JSON.stringify(addToken));
+  }, [addToken]);
+
+  const handleAddToken = () => {
+    setAddToken((prev) => [
+      ...prev,
+      {
+        image: BinanceLogo,
+        title: "BNB",
+        balance: "0.0",
+        inputPrice: 1,
+        estimate: "~$ 1,731.87",
+      },
+    ]);
+  };
+
+  const handleRemoveToken = (index) => {
+    setAddToken((prevTokens) => {
+      // Create a new array without the token to be removed
+      return prevTokens.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleNetworkChange = (name) => {
+    setActiveNetwork(name);
   };
 
   return (
@@ -58,49 +69,24 @@ const Home = () => {
             <h1 className="text-white font-semibold text-xl md:text-2xl leading-9">
               Swap
             </h1>
-            {swapNetwork()}
+            <SwapNetwork
+              active={activeNetwork}
+              onNetworkChange={handleNetworkChange}
+            />
           </div>
 
           <div className="mt-6">
             <h2 className="text-white font-semibold text-xl">You Pay</h2>
-            <div className="my-2">
-              <div className="box-inner-layout">
-                <div className="text-white font-semibold text-xl box-border-layout">
-                  <div className="flex-center  md:gap-16">
-                    <div className="flex-center gap-[17.4px] md:gap-10">
-                      <div className="relative">
-                        <img
-                          src={EthereumBigLogo}
-                          alt="EthereumBigLogo"
-                          className="w-12 h-12 object-contain"
-                        />
-                        <div className="w-8 h-8 bg-white rounded-full flex-center absolute bottom-0 -right-3 top-6">
-                          <img
-                            src={EthereumSmallLogo}
-                            alt="EthereumSmallLogo"
-                            className="p-1" // w-5 h-5 object-contain
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p>ETH</p>
-                        <p className="text-base font-normal">Balance: 0.0</p>
-                      </div>
-                    </div>
-                    <p>
-                      <i className="fa-solid fa-chevron-down" />
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end text-white font-semibold text-xl box-border-layout">
-                  <p>1</p>
-                  <p className="text-[#A5A0AA] font-normal text-base">
-                    ~$ 1,731.87
-                  </p>
-                </div>
-              </div>
-            </div>
-            <AddTokensButton />
+            {addToken.map((token, index) => (
+              <Token
+                key={index}
+                id={index}
+                token={token}
+                length={addToken.length}
+                onRemoveToken={() => handleRemoveToken(index)}
+              />
+            ))}
+            <AddTokensButton onClick={handleAddToken} />
           </div>
 
           <div className="my-4 flex-center ">
