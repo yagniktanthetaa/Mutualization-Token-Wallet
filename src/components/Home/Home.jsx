@@ -15,8 +15,10 @@ const AddTokensButton = ({ onClick }) => {
 };
 
 const Home = () => {
-  const [activeNetwork, setActiveNetwork] = useState("Mainnet");
   const initialTokens = JSON.parse(localStorage.getItem("tokens")) || [];
+  const initialNetwork = localStorage.getItem("network") || "";
+
+  const INITIAL_NETWORK = "Mainnet";
 
   const INITIAL_TOKEN = [
     {
@@ -28,6 +30,10 @@ const Home = () => {
     },
   ];
 
+  const [activeNetwork, setActiveNetwork] = useState(
+    initialNetwork.length ? initialNetwork : INITIAL_NETWORK
+  );
+
   const [addToken, setAddToken] = useState(
     initialTokens.length ? initialTokens : INITIAL_TOKEN
   );
@@ -35,7 +41,8 @@ const Home = () => {
   useEffect(() => {
     // Save the updated addToken data to localStorage whenever it changes
     localStorage.setItem("tokens", JSON.stringify(addToken));
-  }, [addToken]);
+    localStorage.setItem("network", activeNetwork);
+  }, [addToken, activeNetwork]);
 
   const handleAddToken = () => {
     setAddToken((prev) => [
