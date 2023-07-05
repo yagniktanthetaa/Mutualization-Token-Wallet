@@ -5,6 +5,7 @@ import SwapWrapper from "../common/ui/SwapWrapper";
 import Button from "../common/ui/Button/Button";
 import SwapNetwork from "./SwapNetwork";
 import Token from "./Token";
+import { notification } from "../common/utils/utility";
 
 const AddTokensButton = ({ onClick }) => {
   return (
@@ -34,33 +35,53 @@ const Home = () => {
     initialNetwork.length ? initialNetwork : INITIAL_NETWORK
   );
 
-  const [addToken, setAddToken] = useState(
+  const [addFromToken, setAddFromToken] = useState(
     initialTokens.length ? initialTokens : INITIAL_TOKEN
   );
 
   useEffect(() => {
     // Save the updated addToken data to localStorage whenever it changes
-    localStorage.setItem("tokens", JSON.stringify(addToken));
+    localStorage.setItem("tokens", JSON.stringify(addFromToken));
     localStorage.setItem("network", activeNetwork);
-  }, [addToken, activeNetwork]);
+  }, [addFromToken, activeNetwork]);
 
-  const handleAddToken = () => {
-    setAddToken((prev) => [
-      ...prev,
-      {
-        image: BinanceLogo,
-        title: "BNB",
-        balance: "0.0",
-        inputPrice: 1,
-        estimate: "~$ 1,731.87",
-      },
-    ]);
+  const handleAddFromToken = () => {
+    if (addFromToken.length < 5) {
+      setAddFromToken((prev) => [
+        ...prev,
+        {
+          image: BinanceLogo,
+          title: "BNB",
+          balance: "0.0",
+          inputPrice: 1,
+          estimate: "~$ 1,731.87",
+        },
+      ]);
+    } else {
+      notification("Max 5 tokens can be added", "error");
+    }
   };
 
   const handleRemoveToken = (index) => {
-    setAddToken((prevTokens) => {
+    setAddFromToken((prevTokens) => {
       // Create a new array without the token to be removed
       return prevTokens.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleEditFromToken = (index) => {
+    const updatedToken = {
+      image: BinanceLogo,
+      title: "BNB",
+      balance: "1.0",
+      inputPrice: 1,
+      estimate: "~$ 1,731.87",
+    };
+
+    setAddFromToken((prevTokens) => {
+      const newTokens = [...prevTokens];
+      newTokens[index] = updatedToken;
+      return newTokens;
     });
   };
 
@@ -84,16 +105,17 @@ const Home = () => {
 
           <div className="mt-6">
             <h2 className="text-white font-semibold text-xl">You Pay</h2>
-            {addToken.map((token, index) => (
+            {addFromToken.map((token, index) => (
               <Token
                 key={index}
                 id={index}
                 token={token}
-                length={addToken.length}
+                length={addFromToken.length}
                 onRemoveToken={() => handleRemoveToken(index)}
+                onEditToken={() => handleEditFromToken(index)}
               />
             ))}
-            <AddTokensButton onClick={handleAddToken} />
+            <AddTokensButton onClick={handleAddFromToken} />
           </div>
 
           <div className="my-4 flex-center ">

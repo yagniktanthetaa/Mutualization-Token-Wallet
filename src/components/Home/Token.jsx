@@ -1,6 +1,6 @@
 import React from "react";
 
-const Token = ({ token, onRemoveToken, length, id }) => {
+const Token = ({ token, onRemoveToken, onEditToken, length, id }) => {
   return (
     <>
       <div className="my-2 relative" key={id}>
@@ -29,7 +29,7 @@ const Token = ({ token, onRemoveToken, length, id }) => {
                   </p>
                 </div>
               </div>
-              <p>
+              <p onClick={onEditToken}>
                 <i className="fa-solid fa-chevron-down" />
               </p>
             </div>
